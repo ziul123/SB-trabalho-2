@@ -1,47 +1,56 @@
 SECTION .text
-global	_sum
+global	_exp
 
-extern	getw, getdw, putw, putdw
-extern	pres
+extern	getw, getdw, putw, putdw, puts
+extern	pres, of
 
-; void _sum()
-; calls right sum
-_sum:
+; void _exp()
+; calls right exp
+_exp:
 	enter	0, 0
 	cmp byte [pres], '0'
 	je		p16
-	call	_sum32
-	jmp		_sum_end
+	call	_exp32
+	jmp		_exp_end
 p16:
-	call	_sum16
-_sum_end:
+	call	_exp16
+_exp_end:
 	leave
 	ret
 
-; void _sum16()
-; reads two int16 and prints sum
+; void _exp16()
+; reads two int16 and prints exp
 %define num1 word [EBP-2]
-_sum16:
+_exp16:
 	enter	2, 0
 	call	getw
 	mov		num1, ax
 	call	getw
-	add		ax, num1
+	;exp with mul here
+	;checar overflow
 	push	ax
 	call	putw
 	leave
 	ret
 
-; void _sum32()
-; reads two int32 and prints sum
+; void _exp32()
+; reads two int32 and prints exp
 %define num1 dword [EBP-4]
-_sum32:
+_exp32:
 	enter 4, 0
 	call	getdw
 	mov		num1, eax
 	call	getdw
-	add		eax, num1
+	;exp with mul here
+	;checar overflow
 	push	eax
 	call	putdw
 	leave
 	ret
+
+overflow:
+	push	of
+	call	puts
+	mov		eax, 1
+	mov		ebx, 1
+	int		0x80

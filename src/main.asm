@@ -11,6 +11,7 @@ menu5 db	"- 4: DIVISAO", 0xA, 0xA, 0
 menu6 db	"- 5: EXPONENCIACAO", 0xA, 0
 menu7 db	"- 6: MOD", 0xA, 0
 menu8 db	"- 7: SAIR", 0xA, 0
+of db		"OCORREU OVERFLOW", 0xA, 0
 
 SECTION .bss
 nome resb	50	;nome do usuário
@@ -18,9 +19,10 @@ pres resb	1	;precisão escolhida: 0x30->16, 0x31->32
 opt	resb	1	;opção do menu
 
 SECTION .text
-global _start
+global	_start
+global	pres, of
 
-extern	puts, putw, putdw
+extern	puts
 extern	_sum
 extern	_sub
 extern	_mul

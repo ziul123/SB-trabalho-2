@@ -1,47 +1,53 @@
 SECTION .text
-global	_sum
+global	_mod
 
 extern	getw, getdw, putw, putdw
 extern	pres
 
-; void _sum()
-; calls right sum
-_sum:
+; void _mod()
+; calls right mod
+_mod:
 	enter	0, 0
 	cmp byte [pres], '0'
 	je		p16
-	call	_sum32
-	jmp		_sum_end
+	call	_mod32
+	jmp		_mod_end
 p16:
-	call	_sum16
-_sum_end:
+	call	_mod16
+_mod_end:
 	leave
 	ret
 
-; void _sum16()
-; reads two int16 and prints sum
+; void _mod16()
+; reads two int16 and prints mod
 %define num1 word [EBP-2]
-_sum16:
+_mod16:
 	enter	2, 0
 	call	getw
 	mov		num1, ax
 	call	getw
-	add		ax, num1
-	push	ax
+	mov		bx, ax
+	mov		ax, num1
+	cwd				;extend sign of ax into dx
+	idiv	bx
+	push	dx		;mod in dx
 	call	putw
 	leave
 	ret
 
-; void _sum32()
-; reads two int32 and prints sum
+; void _mod32()
+; reads two int32 and prints mod
 %define num1 dword [EBP-4]
-_sum32:
+_mod32:
 	enter 4, 0
 	call	getdw
 	mov		num1, eax
 	call	getdw
-	add		eax, num1
-	push	eax
+	mov		ebx, eax
+	mov		eax, num1
+	cdq				;extend sign of eax into edx
+	idiv	ebx
+	push	edx		;mod in edx
 	call	putdw
 	leave
 	ret
