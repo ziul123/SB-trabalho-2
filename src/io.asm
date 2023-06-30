@@ -7,7 +7,7 @@ global putdw
 ; prints str
 puts:
 	enter 	0, 0
-	push	[EBP+8]
+	push dword [EBP+8]
     call    strlen
 
     mov     edx, eax
