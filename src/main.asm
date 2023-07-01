@@ -1,4 +1,5 @@
 SECTION .data
+global	of
 msg1 db		"Bem vindo. Digite seu nome: ", 0
 msg2 db 	"Hola, ", 0
 msg3 db 	", bem-vindo ao programa de CALC IA-32", 0xA, 0
@@ -14,13 +15,13 @@ menu8 db	"- 7: SAIR", 0xA, 0
 of db		"OCORREU OVERFLOW", 0xA, 0
 
 SECTION .bss
-nome resb	50	;nome do usuário
+global	pres
+nome resb	100	;nome do usuário
 pres resb	1	;precisão escolhida: 0x30->16, 0x31->32
 opt	resb	1	;opção do menu
 
 SECTION .text
 global	_start
-global	pres, of
 
 extern	puts
 extern	_sum
@@ -45,6 +46,7 @@ _start:
 	call	puts
 	;ler precisão
 
+menu:
 	push	menu1
 	call	puts
 	push	menu2
@@ -61,3 +63,39 @@ _start:
 	call	puts
 	push	menu8
 	call	puts
+	;ler opção
+	cmp byte [opt], '1'
+	je		Osum
+	cmp byte [opt], '2'
+	je		Osub
+	cmp byte [opt], '3'
+	je		Omul
+	cmp byte [opt], '4'
+	je		Odiv
+	cmp byte [opt], '5'
+	je		Oexp
+	cmp byte [opt], '6'
+	je		Omod
+
+	mov		eax, 1
+	mov		ebx, 0
+	int		0x80
+
+Osum:
+	call	_sum
+	jmp		menu
+Osub:
+	call	_sub
+	jmp		menu
+Omul:
+	call	_mul
+	jmp		menu
+Odiv:
+	call	_div
+	jmp		menu
+Oexp:
+	call	_exp
+	jmp		menu
+Omod:
+	call	_mod
+	jmp		menu

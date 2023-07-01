@@ -22,7 +22,7 @@ _div_end:
 ; reads two int16 and prints div
 %define num1 word [EBP-2]
 _div16:
-	enter	4, 0
+	enter	2, 0
 	call	getw
 	mov		num1, ax
 	call	getw

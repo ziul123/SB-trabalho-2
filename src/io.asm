@@ -1,7 +1,8 @@
+SECTION .bss
+local_str resb 11	;max len of int32 str
+
 SECTION .text
-global puts
-global putw
-global putdw
+global	puts, putw, putdw, getw, getdw
 
 ; void puts(char* str)
 ; prints str
