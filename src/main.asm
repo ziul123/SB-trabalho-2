@@ -8,7 +8,7 @@ menu1 db	"ESCOLHA UMA OPÇÃO:", 0xA, 0
 menu2 db	"- 1: SOMA", 0xA, 0
 menu3 db	"- 2: SUBTRACAO", 0xA, 0
 menu4 db	"- 3: MULTIPLICACAO", 0xA, 0
-menu5 db	"- 4: DIVISAO", 0xA, 0xA, 0
+menu5 db	"- 4: DIVISAO", 0xA, 0
 menu6 db	"- 5: EXPONENCIACAO", 0xA, 0
 menu7 db	"- 6: MOD", 0xA, 0
 menu8 db	"- 7: SAIR", 0xA, 0
@@ -16,35 +16,43 @@ of db		"OCORREU OVERFLOW", 0xA, 0
 
 SECTION .bss
 global	pres
-nome resb	100	;nome do usuário
-pres resb	1	;precisão escolhida: 0x30->16, 0x31->32
-opt	resb	1	;opção do menu
+opt	resb	2	;opção do menu
+pres resb	2	;precisão escolhida: 0x30->16, 0x31->32
+nome resb	101	;nome do usuário
 
 SECTION .text
 global	_start
 
-extern	puts
-extern	_sum
-extern	_sub
-extern	_mul
-extern	_div
-extern	_exp
-extern	_mod
+extern	puts, gets
+extern	_sum, _sub, _mul, _div, _exp, _mod
 
 _start:
 	push	msg1
 	call	puts
+
 	;ler nome do usuário
+	push dword 100
+	push	nome
+	call	gets
 
 	push	msg2
 	call	puts
+
 	;print nome do usuário
+	push	nome
+	call	puts
 
 	push	msg3
 	call	puts
 	push	msg4
 	call	puts
+
 	;ler precisão
+	mov		eax, 3
+	mov		ebx, 0
+	mov		ecx, pres
+	mov		edx, 2
+	int		0x80
 
 menu:
 	push	menu1
@@ -63,7 +71,14 @@ menu:
 	call	puts
 	push	menu8
 	call	puts
+
 	;ler opção
+	mov		eax, 3
+	mov		ebx, 0
+	mov		ecx, opt
+	mov		edx, 2
+	int		0x80
+
 	cmp byte [opt], '1'
 	je		Osum
 	cmp byte [opt], '2'

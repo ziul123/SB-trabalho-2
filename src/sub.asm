@@ -26,7 +26,9 @@ _sub16:
 	call	getw
 	mov		num1, ax
 	call	getw
-	sub		ax, num1
+	mov		bx, ax
+	mov		ax, num1
+	sub		ax, bx
 	push	ax
 	call	putw
 	leave
@@ -40,7 +42,7 @@ _sub32:
 	call	getdw
 	mov		num1, eax
 	call	getdw
-	sub		eax, num1
+	sub		num1, eax
 	push	eax
 	call	putdw
 	leave
