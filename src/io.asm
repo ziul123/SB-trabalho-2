@@ -44,7 +44,7 @@ putw:
 	enter	4, 0
 	mov		num_str, local_str
 	
-	mov word ax, [EBP+8]
+	mov		ax, [EBP+8]
 	xor		ecx, ecx
 	mov		ebx, num_str
 	mov		si, 10
@@ -78,12 +78,50 @@ putw_loop2:
 	call	puts
 
 	leave
-	ret
+	ret 2
 
 ; void putdw(int32 x)
 ; prints x
+%define num_str dword [EBP-4]
 putdw:
-	ret
+	enter	4, 0
+	mov		num_str, local_str
+	
+	mov		eax, [EBP+8]
+	xor		ecx, ecx
+	mov		ebx, num_str
+	mov		esi, 10
+	cmp		eax , 0
+	jge		putdw_loop1
+	mov byte [ebx], '-'
+	inc		ebx
+	neg		eax
+
+putdw_loop1:
+	cdq
+	idiv	esi
+	add		edx, 0x30
+	push	edx
+	inc		ecx
+	cmp		eax, 0
+	je		putdw_nt
+	jmp		putdw_loop1
+
+putdw_nt:
+	mov word [ebx+ecx], 0x000A
+
+putdw_loop2:
+	pop		edx
+	mov		[ebx], dl
+	inc		ebx
+	dec		ecx
+	jnz		putdw_loop2
+
+	push	num_str
+	call	puts
+
+	leave
+	ret 4
 
 ; void gets(char* str, int size)
 ; reads string from keyboard and stores in str
@@ -105,9 +143,9 @@ gets:
 ; int16 getw()
 ; reads 16 bit int from keyboard
 %define num_str dword [EBP-4]
-%define is_neg byte [EBP-5]
+%define is_neg word [EBP-6]
 getw:
-	enter	5, 0
+	enter	6, 0
 	mov		num_str, local_str
 
 	push dword 12
@@ -116,9 +154,11 @@ getw:
 
 	xor		ax, ax
 	xor		ecx, ecx
+	xor		dx, dx
 	mov		ebx, num_str
 	cmp byte [ebx], '-'	;is negative?
-	sete	is_neg
+	sete	dl
+	mov		is_neg, dx
 	jne		getw_loop
 	inc		ecx
 	
@@ -146,5 +186,44 @@ getw_end:
 
 ; int32 getdw()
 ; reads 32 bit int from keyboard
+%define num_str dword [EBP-4]
+%define is_neg word [EBP-6]
 getdw:
+	enter	6, 0
+	mov		num_str, local_str
+
+	push dword 12
+	push 	num_str
+	call	gets
+
+	xor		eax, eax
+	xor		ecx, ecx
+	xor		dx, dx
+	mov		ebx, num_str
+	cmp byte [ebx], '-'	;is negative?
+	sete	dl
+	mov		is_neg, dx
+	jne		getdw_loop
+	inc		ecx
+	
+getdw_loop:
+	sub byte [ebx+ecx], 0x30
+	movsx	edx, byte [ebx+ecx]
+	add		eax, edx
+
+	cmp byte [ebx+ecx+1], 0
+	je		getdw_l_end
+	mov		edx, eax
+	sal		eax, 2
+	add		eax, edx
+	add		eax, eax		;eax = eax*10
+	inc		ecx
+	jmp		getdw_loop
+
+getdw_l_end:
+	cmp		is_neg, 0
+	je		getdw_end
+	neg		eax
+getdw_end:
+	leave
 	ret
