@@ -26,8 +26,23 @@ _exp16:
 	call	getw
 	mov		num1, ax
 	call	getw
-	;exp with mul here
-	;checar overflow
+
+	cmp 	ax, 0
+	jl 		ltz0
+
+	mov 	cx, ax
+	mov 	ax, 1
+ls0:
+		test cx, cx
+		jz   le0
+		imul num1
+		jo	 overflow
+		dec  cx
+		jmp  ls0
+
+ltz0:
+	mov 	ax, 0
+le0:
 	push	ax
 	call	putw
 	leave
@@ -41,8 +56,23 @@ _exp32:
 	call	getdw
 	mov		num1, eax
 	call	getdw
-	;exp with mul here
-	;checar overflow
+
+	cmp		eax, 0
+	jl  	ltz1
+
+	mov 	ecx, eax
+	mov 	eax, 1
+ls1:
+		test ecx, ecx
+		jz   le1
+		imul num1
+		jo   overflow
+		dec  ecx
+		jmp  ls1
+
+ltz1:
+	mov 	eax, 0
+le1:
 	push	eax
 	call	putdw
 	leave
